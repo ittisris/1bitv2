@@ -25,6 +25,7 @@ function showIO () {
     }
 }
 input.onButtonPressed(Button.A, function () {
+    endless = false
     reset()
 })
 function clkPosEdge () {
@@ -46,7 +47,7 @@ function clkNegEdge () {
 }
 function readIO () {
     if (pc == 0) {
-        input_port[pc] = pins.digitalReadPin(DigitalPin.P12)
+        input_port[pc] = pins.digitalReadPin(DigitalPin.P5)
         showIO()
     }
     pins.digitalWritePin(DigitalPin.P0, input_port[ioaddress[pc]])
@@ -80,7 +81,6 @@ function sendInstruc () {
     pins.digitalWritePin(DigitalPin.P16, instruc % 2)
 }
 function reset () {
-    endless = false
     pins.digitalWritePin(DigitalPin.P8, 1)
     pins.digitalWritePin(DigitalPin.P1, 1)
     pc = 0
@@ -90,9 +90,9 @@ function reset () {
     basic.clearScreen()
 }
 let instruc = 0
-let endless = false
 let pc = 0
 let x2 = 0
+let endless = false
 let tmp = 0
 let output_port: number[] = []
 let input_port: number[] = []
@@ -125,6 +125,7 @@ pins.setPull(DigitalPin.P2, PinPullMode.PullDown)
 pins.setPull(DigitalPin.P8, PinPullMode.PullDown)
 tmp = pins.digitalReadPin(DigitalPin.P0)
 tmp = pins.digitalReadPin(DigitalPin.P2)
+endless = false
 reset()
 basic.forever(function () {
     basic.pause(100)

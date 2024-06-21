@@ -8,7 +8,7 @@ def show4(num: number, line: number):
             led.unplot(x, line)
         tmp = Math.floor(tmp / 2)
 def showIO():
-    x2 = 0
+    global x2
     while x2 <= len(input_port):
         if input_port[x2] == 1:
             led.plot(x2, 3)
@@ -21,6 +21,8 @@ def showIO():
         x2 += 1
 
 def on_button_pressed_a():
+    global endless
+    endless = False
     reset()
 input.on_button_pressed(Button.A, on_button_pressed_a)
 
@@ -40,7 +42,7 @@ def clkNegEdge():
     basic.pause(500)
 def readIO():
     if pc == 0:
-        input_port[pc] = pins.digital_read_pin(DigitalPin.P12)
+        input_port[pc] = pins.digital_read_pin(DigitalPin.P5)
         showIO()
     pins.digital_write_pin(DigitalPin.P0, input_port[ioaddress[pc]])
 def writeIO():
@@ -74,8 +76,7 @@ def sendInstruc():
     instruc = Math.floor(instruc / 2)
     pins.digital_write_pin(DigitalPin.P16, instruc % 2)
 def reset():
-    global endless, pc
-    endless = False
+    global pc
     pins.digital_write_pin(DigitalPin.P8, 1)
     pins.digital_write_pin(DigitalPin.P1, 1)
     pc = 0
@@ -84,8 +85,9 @@ def reset():
     pins.digital_write_pin(DigitalPin.P8, 0)
     basic.clear_screen()
 instruc = 0
-endless = False
 pc = 0
+x2 = 0
+endless = False
 tmp = 0
 output_port: List[number] = []
 input_port: List[number] = []
@@ -98,8 +100,11 @@ input_port = [0, 0, 0]
 output_port = [0, 0, 0]
 pins.set_pull(DigitalPin.P0, PinPullMode.PULL_UP)
 pins.set_pull(DigitalPin.P1, PinPullMode.PULL_UP)
+pins.set_pull(DigitalPin.P2, PinPullMode.PULL_DOWN)
 pins.set_pull(DigitalPin.P8, PinPullMode.PULL_DOWN)
 tmp = pins.digital_read_pin(DigitalPin.P0)
+tmp = pins.digital_read_pin(DigitalPin.P2)
+endless = False
 reset()
 
 def on_forever():

@@ -1,89 +1,72 @@
-function show4(num: number, line: number) {
-    
+function show4 (num: number, line: number) {
     tmp = num
-    for (let x = 0; x < 4; x++) {
+    for (let x = 0; x <= 3; x++) {
         if (tmp % 2 == 1) {
             led.plot(x, line)
         } else {
             led.unplot(x, line)
         }
-        
         tmp = Math.floor(tmp / 2)
     }
 }
-
-function showIO() {
-    let x2 = 0
+function showIO () {
     while (x2 <= input_port.length) {
         if (input_port[x2] == 1) {
             led.plot(x2, 3)
         } else {
             led.unplot(x2, 3)
         }
-        
         if (output_port[x2] == 1) {
             led.plot(x2, 4)
         } else {
             led.unplot(x2, 4)
         }
-        
         x2 += 1
     }
 }
-
-input.onButtonPressed(Button.A, function on_button_pressed_a() {
+input.onButtonPressed(Button.A, function () {
     reset()
 })
-function clkPosEdge() {
-    
+function clkPosEdge () {
     if (pins.digitalReadPin(DigitalPin.P2) == 1) {
         writeIO()
     }
-    
     pins.digitalWritePin(DigitalPin.P1, 1)
     pc = pc + 1
     if (pc == opcode.length) {
         pc = 0
     }
-    
     basic.pause(500)
 }
-
-function clkNegEdge() {
+function clkNegEdge () {
     sendInstruc()
     basic.pause(100)
     pins.digitalWritePin(DigitalPin.P1, 0)
     basic.pause(500)
 }
-
-function readIO() {
+function readIO () {
     if (pc == 0) {
         input_port[pc] = pins.digitalReadPin(DigitalPin.P12)
         showIO()
     }
-    
     pins.digitalWritePin(DigitalPin.P0, input_port[ioaddress[pc]])
 }
-
-function writeIO() {
+function writeIO () {
     output_port[ioaddress[pc]] = pins.digitalReadPin(DigitalPin.P0)
     showIO()
 }
-
-input.onButtonPressed(Button.AB, function on_button_pressed_ab() {
-    
+input.onButtonPressed(Button.AB, function () {
     endless = true
     while (endless) {
         clkNegEdge()
         clkPosEdge()
     }
 })
-input.onButtonPressed(Button.B, function on_button_pressed_b() {
+input.onButtonPressed(Button.B, function () {
     clkNegEdge()
     clkPosEdge()
 })
-function sendInstruc() {
-    
+function sendInstruc () {
     instruc = opcode[pc]
     show4(pc, 0)
     show4(instruc, 1)
@@ -96,9 +79,7 @@ function sendInstruc() {
     instruc = Math.floor(instruc / 2)
     pins.digitalWritePin(DigitalPin.P16, instruc % 2)
 }
-
-function reset() {
-    
+function reset () {
     endless = false
     pins.digitalWritePin(DigitalPin.P8, 1)
     pins.digitalWritePin(DigitalPin.P1, 1)
@@ -108,25 +89,43 @@ function reset() {
     pins.digitalWritePin(DigitalPin.P8, 0)
     basic.clearScreen()
 }
-
 let instruc = 0
 let endless = false
 let pc = 0
+let x2 = 0
 let tmp = 0
-let output_port : number[] = []
-let input_port : number[] = []
-let ioaddress : number[] = []
-let opcode : number[] = []
+let output_port: number[] = []
+let input_port: number[] = []
+let ioaddress: number[] = []
+let opcode: number[] = []
 led.setBrightness(50)
-opcode = [0, 1, 2, 3, 4, 5, 6]
-ioaddress = [0, 1, 0, 1, 0, 1, 0]
+opcode = [
+0,
+1,
+2,
+3,
+4,
+5,
+6
+]
+ioaddress = [
+0,
+1,
+0,
+1,
+0,
+1,
+0
+]
 input_port = [0, 0, 0]
 output_port = [0, 0, 0]
 pins.setPull(DigitalPin.P0, PinPullMode.PullUp)
 pins.setPull(DigitalPin.P1, PinPullMode.PullUp)
+pins.setPull(DigitalPin.P2, PinPullMode.PullDown)
 pins.setPull(DigitalPin.P8, PinPullMode.PullDown)
 tmp = pins.digitalReadPin(DigitalPin.P0)
+tmp = pins.digitalReadPin(DigitalPin.P2)
 reset()
-basic.forever(function on_forever() {
+basic.forever(function () {
     basic.pause(100)
 })

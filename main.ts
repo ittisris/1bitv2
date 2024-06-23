@@ -47,7 +47,7 @@ function clkNegEdge () {
 }
 function readIO () {
     if (pc == 0) {
-        input_port[pc] = pins.digitalReadPin(DigitalPin.P5)
+        input_port[pc] = pins.digitalReadPin(DigitalPin.P3)
         showIO()
     }
     pins.digitalWritePin(DigitalPin.P0, input_port[ioaddress[pc]])
@@ -119,9 +119,10 @@ ioaddress = [
 ]
 input_port = [0, 0, 0]
 output_port = [0, 0, 0]
-pins.setPull(DigitalPin.P0, PinPullMode.PullUp)
+pins.setPull(DigitalPin.P0, PinPullMode.PullNone)
 pins.setPull(DigitalPin.P1, PinPullMode.PullUp)
 pins.setPull(DigitalPin.P2, PinPullMode.PullDown)
+pins.setPull(DigitalPin.P3, PinPullMode.PullNone)
 pins.setPull(DigitalPin.P8, PinPullMode.PullDown)
 tmp = pins.digitalReadPin(DigitalPin.P0)
 tmp = pins.digitalReadPin(DigitalPin.P2)

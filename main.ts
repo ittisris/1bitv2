@@ -31,6 +31,9 @@ input.onButtonPressed(Button.A, function () {
 function clkPosEdge () {
     if (pins.digitalReadPin(DigitalPin.P2) == 1) {
         writeIO()
+        led.plot(4, 0)
+    } else {
+        led.unplot(4, 0)
     }
     pins.digitalWritePin(DigitalPin.P1, 1)
     pc = pc + 1
@@ -47,13 +50,18 @@ function clkNegEdge () {
 }
 function readIO () {
     if (pc == 0) {
-        input_port[pc] = pins.digitalReadPin(DigitalPin.P3)
+        input_port[ioaddress[pc]] = pins.digitalReadPin(DigitalPin.P3)
         showIO()
     }
     pins.digitalWritePin(DigitalPin.P0, input_port[ioaddress[pc]])
 }
 function writeIO () {
     output_port[ioaddress[pc]] = pins.digitalReadPin(DigitalPin.P0)
+    if (pins.digitalReadPin(DigitalPin.P0) == 1) {
+        led.plot(4, 1)
+    } else {
+        led.unplot(4, 1)
+    }
     showIO()
 }
 input.onButtonPressed(Button.AB, function () {
@@ -71,6 +79,7 @@ function sendInstruc () {
     instruc = opcode[pc]
     show4(pc, 0)
     show4(instruc, 1)
+    show4(ioaddress[pc], 2)
     readIO()
     pins.digitalWritePin(DigitalPin.P13, instruc % 2)
     instruc = Math.floor(instruc / 2)
@@ -82,6 +91,14 @@ function sendInstruc () {
 }
 function reset () {
     pins.digitalWritePin(DigitalPin.P8, 1)
+    pins.setPull(DigitalPin.P0, PinPullMode.PullNone)
+    pins.setPull(DigitalPin.P1, PinPullMode.PullUp)
+    pins.setPull(DigitalPin.P2, PinPullMode.PullDown)
+    pins.setPull(DigitalPin.P3, PinPullMode.PullNone)
+    pins.setPull(DigitalPin.P8, PinPullMode.PullDown)
+    tmp = pins.digitalReadPin(DigitalPin.P0)
+    tmp = pins.digitalReadPin(DigitalPin.P2)
+    tmp = pins.digitalReadPin(DigitalPin.P3)
     pins.digitalWritePin(DigitalPin.P1, 1)
     pc = 0
     basic.showString("R")
@@ -92,8 +109,8 @@ function reset () {
 let instruc = 0
 let pc = 0
 let x2 = 0
-let endless = false
 let tmp = 0
+let endless = false
 let output_port: number[] = []
 let input_port: number[] = []
 let ioaddress: number[] = []
@@ -101,12 +118,13 @@ let opcode: number[] = []
 led.setBrightness(50)
 opcode = [
 0,
-1,
-2,
-3,
-4,
-5,
-6
+12,
+13,
+15,
+0,
+12,
+13,
+15
 ]
 ioaddress = [
 0,
@@ -115,17 +133,11 @@ ioaddress = [
 1,
 0,
 1,
-0
+0,
+1
 ]
-input_port = [0, 0, 0]
-output_port = [0, 0, 0]
-pins.setPull(DigitalPin.P0, PinPullMode.PullNone)
-pins.setPull(DigitalPin.P1, PinPullMode.PullUp)
-pins.setPull(DigitalPin.P2, PinPullMode.PullDown)
-pins.setPull(DigitalPin.P3, PinPullMode.PullNone)
-pins.setPull(DigitalPin.P8, PinPullMode.PullDown)
-tmp = pins.digitalReadPin(DigitalPin.P0)
-tmp = pins.digitalReadPin(DigitalPin.P2)
+input_port = [1, 0, 1]
+output_port = [1, 0, 1]
 endless = false
 reset()
 basic.forever(function () {
